@@ -15,7 +15,7 @@ class CustomDialpad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Dialpad'),
+      title: Text('Voila_Call'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.voila_call_dummy">
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <application
         android:label="voila_call_dummy"

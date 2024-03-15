@@ -62,7 +62,8 @@ class _DialpadScreenState extends State<DialpadScreen> {
                 return ListTile(
                   title: Text(log.name ?? 'Unknown'),
                   subtitle: Text(log.number ?? 'Unknown'),
-                  trailing: Text(log.timestamp?.toString() ?? 'Unknown'),
+                  trailing: Text(_formatTimestamp(log.timestamp) ?? 'Unknown'),
+
                 );
               },
             ),
@@ -81,3 +82,12 @@ class _DialpadScreenState extends State<DialpadScreen> {
     );
   }
 }
+String? _formatTimestamp(int? timestamp) {
+  if (timestamp == null) return null;
+  final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+  final String hours = '${dateTime.hour}'.padLeft(2, '0');
+  final String minutes = '${dateTime.minute}'.padLeft(2, '0');
+  final String seconds = '${dateTime.second}'.padLeft(2, '0');
+  return '$hours:$minutes:$seconds';
+}
+

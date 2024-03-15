@@ -33,6 +33,7 @@ dependencies:
   call_log: ^3.0.2
   url_launcher: ^6.0.6
   intl: ^0.17.0
+  permission_handler: ^10.2.0
 
 
 
