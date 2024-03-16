@@ -41,9 +41,8 @@ class ContactDetailsScreen extends StatelessWidget {
     }
     // Format duration into HH:MM:SS format
     final Duration d = Duration(seconds: durationInSeconds);
-    return '${d.inHours}:${d.inMinutes.remainder(60)}:${d.inSeconds.remainder(60)}';
+    return '${d.inHours.toString().padLeft(2, '0')}:${d.inMinutes.remainder(60).toString().padLeft(2, '0')}:${d.inSeconds.remainder(60).toString().padLeft(2, '0')}';
   }
-
 
   String _formatDateTime(int timestamp) {
     // Format timestamp into HH:MM:SS format

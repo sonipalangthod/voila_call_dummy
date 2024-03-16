@@ -1,6 +1,8 @@
+// main.dart
 import 'package:flutter/material.dart';
-import 'screens/dialpad_screen.dart';
-import 'screens/call_log_screen.dart';
+import 'package:voila_call_dummy/screens/call_log_screen.dart';
+import 'package:voila_call_dummy/screens/dialpad_screen.dart';
+import 'package:voila_call_dummy/screens/voila_call_screen.dart';
 
 void main() {
   runApp(CallLogApp());
@@ -21,7 +23,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // Number of tabs
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Voila_Call'),
@@ -29,6 +31,7 @@ class HomeScreen extends StatelessWidget {
             tabs: [
               Tab(text: 'Call Log'),
               Tab(text: 'Dialpad'),
+              Tab(text: 'Status of call'),
             ],
           ),
         ),
@@ -36,6 +39,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             CallLogScreen(),
             DialpadScreen(),
+            VoilaCallScreen(),
           ],
         ),
       ),

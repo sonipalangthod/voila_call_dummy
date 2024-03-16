@@ -1,8 +1,11 @@
+// dialpad_screen.dart
 import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
-import 'package:url_launcher/url_launcher.dart'; // Import the url_launcher package
-import 'package:voila_call_dummy/services/call_service.dart'; // Update with your actual project directory
-import 'package:voila_call_dummy/widgets/custom_dialpad.dart'; // Import your custom dialpad widget
+import 'package:url_launcher/url_launcher.dart';
+import 'package:voila_call_dummy/call_log.dart'; // Import CallLogService
+import 'package:voila_call_dummy/screens/voila_call_screen.dart'; // Import VoilaCallScreen
+import 'package:voila_call_dummy/services/call_service.dart';
+import 'package:voila_call_dummy/widgets/custom_dialpad.dart'; // Import CustomDialpad
 
 class DialpadScreen extends StatefulWidget {
   @override
@@ -42,8 +45,11 @@ class _DialpadScreenState extends State<DialpadScreen> {
 
   void _makeCall() {
     String phoneNumber = _enteredDigits.join();
-    // Use the url_launcher package to make the call
     launch('tel:$phoneNumber');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => VoilaCallScreen()),
+    );
   }
 
   @override
@@ -63,7 +69,6 @@ class _DialpadScreenState extends State<DialpadScreen> {
                   title: Text(log.name ?? 'Unknown'),
                   subtitle: Text(log.number ?? 'Unknown'),
                   trailing: Text(_formatTimestamp(log.timestamp) ?? 'Unknown'),
-
                 );
               },
             ),
@@ -82,6 +87,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
     );
   }
 }
+
 String? _formatTimestamp(int? timestamp) {
   if (timestamp == null) return null;
   final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
@@ -90,4 +96,3 @@ String? _formatTimestamp(int? timestamp) {
   final String seconds = '${dateTime.second}'.padLeft(2, '0');
   return '$hours:$minutes:$seconds';
 }
-
