@@ -5,7 +5,7 @@ import 'package:voila_call_dummy/screens/voila_call_screen.dart';
 import 'package:voila_call_dummy/screens/statistics_page.dart'; // Import your statistics page
 
 void main() {
-  runApp(CallLogApp());
+  runApp(CallLogApp() as Widget);
 }
 
 class CallLogApp extends StatelessWidget {
