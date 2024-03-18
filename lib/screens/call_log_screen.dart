@@ -36,14 +36,14 @@ class _CallLogScreenState extends State<CallLogScreen> {
         itemBuilder: (context, index) {
           final call = _callLogs[index];
           return ListTile(
-            title: Text(call.name ?? 'Unknown'),
-            subtitle: Row(
-              children: [
-                Icon(Icons.phone),
-                SizedBox(width: 10),
-                Text(call.number ?? 'Unknown'),
-              ],
+            leading: IconButton(
+              icon: Icon(Icons.call),
+              onPressed: () {
+                _makeCall(call.number ?? '');
+              },
             ),
+            title: Text(call.name ?? 'Unknown'),
+            subtitle: Text(call.number ?? 'Unknown'),
             trailing: Text(_formatTimestamp(call.timestamp)),
             onTap: () {
               // Navigate to ContactDetailsScreen when tapped
@@ -54,32 +54,33 @@ class _CallLogScreenState extends State<CallLogScreen> {
                 ),
               );
             },
-            onLongPress: () {
-              // Make a call when long pressed
-              _makeCall(call.number);
-            },
           );
         },
       ),
     );
   }
-}
 
-String _formatTimestamp(int? timestamp) {
-  if (timestamp == null) {
-    return 'Unknown';
+  String _formatTimestamp(int? timestamp) {
+    if (timestamp == null) {
+      return 'Unknown';
+    }
+    final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
   }
-  final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-  return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
-}
 
-Future<void> _makeCall(String? phoneNumber) async {
-  if (phoneNumber != null) {
-    final url = 'tel:$phoneNumber';
-    if (await canLaunch(url)) {
+  // Function to make a call
+  void _makeCall(String phoneNumber) async {
+    try {
+      final url = 'tel:$phoneNumber';
       await launch(url);
-    } else {
-      throw 'Could not launch $url';
+    } catch (e) {
+      // Handle error if call cannot be launched
+      print('Error launching call: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not make a call'),
+        ),
+      );
     }
   }
 }

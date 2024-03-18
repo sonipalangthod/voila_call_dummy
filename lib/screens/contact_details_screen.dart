@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactDetailsScreen extends StatelessWidget {
   final CallLogEntry call;
 
   ContactDetailsScreen(this.call);
+
+  void _makeCall(String number) {
+    launch('tel:$number');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,10 +17,13 @@ class ContactDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(call.name ?? 'Unknown'),
       ),
-      body: ListView(
+      body: Column(
         children: [
           ListTile(
-            title: Text('Number'),
+            title: Text(
+              'Number',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             subtitle: Text(call.number ?? 'Unknown'),
           ),
           ListTile(
@@ -32,6 +40,12 @@ class ContactDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _makeCall(call.number ?? '');
+        },
+        child: Icon(Icons.call),
+      ),
     );
   }
 
@@ -39,19 +53,16 @@ class ContactDetailsScreen extends StatelessWidget {
     if (durationInSeconds == null) {
       return 'Unknown';
     }
-    // Format duration into HH:MM:SS format
     final Duration d = Duration(seconds: durationInSeconds);
     return '${d.inHours.toString().padLeft(2, '0')}:${d.inMinutes.remainder(60).toString().padLeft(2, '0')}:${d.inSeconds.remainder(60).toString().padLeft(2, '0')}';
   }
 
   String _formatDateTime(int timestamp) {
-    // Format timestamp into HH:MM:SS format
     final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
     return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
   }
 
   String _getCallStatus(CallLogEntry call) {
-    // Determine call status based on duration and call type
     if (call.duration == 0) {
       if (call.callType == CallType.incoming) {
         return 'Missed';
