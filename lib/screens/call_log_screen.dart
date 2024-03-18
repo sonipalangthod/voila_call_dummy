@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'contact_details_screen.dart'; // Import the ContactDetailsScreen
+import 'package:url_launcher/url_launcher.dart';
 
 class CallLogScreen extends StatefulWidget {
   @override
@@ -36,9 +37,14 @@ class _CallLogScreenState extends State<CallLogScreen> {
           final call = _callLogs[index];
           return ListTile(
             title: Text(call.name ?? 'Unknown'),
-            subtitle: Text(call.number ?? 'Unknown'),
+            subtitle: Row(
+              children: [
+                Icon(Icons.phone),
+                SizedBox(width: 10),
+                Text(call.number ?? 'Unknown'),
+              ],
+            ),
             trailing: Text(_formatTimestamp(call.timestamp)),
-
             onTap: () {
               // Navigate to ContactDetailsScreen when tapped
               Navigator.push(
@@ -47,6 +53,10 @@ class _CallLogScreenState extends State<CallLogScreen> {
                   builder: (context) => ContactDetailsScreen(call),
                 ),
               );
+            },
+            onLongPress: () {
+              // Make a call when long pressed
+              _makeCall(call.number);
             },
           );
         },
@@ -61,4 +71,15 @@ String _formatTimestamp(int? timestamp) {
   }
   final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
   return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
+}
+
+Future<void> _makeCall(String? phoneNumber) async {
+  if (phoneNumber != null) {
+    final url = 'tel:$phoneNumber';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 }
