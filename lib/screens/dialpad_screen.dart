@@ -1,4 +1,3 @@
-// dialpad_screen.dart
 import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,6 +51,10 @@ class _DialpadScreenState extends State<DialpadScreen> {
     );
   }
 
+  void _makeCallToContact(String phoneNumber) {
+    launch('tel:$phoneNumber');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,6 +72,9 @@ class _DialpadScreenState extends State<DialpadScreen> {
                   title: Text(log.name ?? 'Unknown'),
                   subtitle: Text(log.number ?? 'Unknown'),
                   trailing: Text(_formatTimestamp(log.timestamp) ?? 'Unknown'),
+                  onTap: () {
+                    _makeCallToContact(log.number ?? '');
+                  },
                 );
               },
             ),
