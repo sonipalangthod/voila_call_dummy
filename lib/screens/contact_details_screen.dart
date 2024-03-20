@@ -14,6 +14,8 @@ class ContactDetailsScreen extends StatefulWidget {
 
 class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   late List<CallLogEntry> callLogEntries;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   @override
   void initState() {
@@ -28,11 +30,50 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     });
   }
 
+  Future<void> _filterCallLogEntriesByDateRange() async {
+    final DateTime? pickedStartDate = await showDatePicker(
+      context: context,
+      initialDate: _startDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (pickedStartDate != null) {
+      final DateTime? pickedEndDate = await showDatePicker(
+        context: context,
+        initialDate: _endDate ?? pickedStartDate,
+        firstDate: pickedStartDate,
+        lastDate: DateTime.now(),
+      );
+      if (pickedEndDate != null) {
+        setState(() {
+          _startDate = pickedStartDate;
+          _endDate = pickedEndDate;
+          _filterCallLogsByDateRange(pickedStartDate, pickedEndDate);
+        });
+      }
+    }
+  }
+
+  void _filterCallLogsByDateRange(DateTime startDate, DateTime endDate) {
+    setState(() {
+      callLogEntries = callLogEntries.where((callLog) {
+        final DateTime callDateTime = DateTime.fromMillisecondsSinceEpoch(callLog.timestamp ?? 0);
+        return callDateTime.isAfter(startDate.subtract(Duration(days: 1))) && callDateTime.isBefore(endDate.add(Duration(days: 1)));
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.call.name ?? 'Unknown'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.filter_list),
+            onPressed: () => _filterCallLogEntriesByDateRange(),
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: callLogEntries.length,
@@ -84,8 +125,6 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
       ],
     );
   }
-
-
 
   String _formatDuration(int? durationInSeconds) {
     if (durationInSeconds == null) {

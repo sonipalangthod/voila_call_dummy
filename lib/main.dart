@@ -3,7 +3,7 @@ import 'package:voila_call_dummy/screens/call_log_screen.dart';
 import 'package:voila_call_dummy/screens/dialpad_screen.dart';
 import 'package:voila_call_dummy/screens/voila_call_screen.dart';
 import 'package:voila_call_dummy/screens/statistics_page.dart'; // Import your statistics page
-
+import 'package:voila_call_dummy/screens/call_log_screen.dart';
 void main() {
   runApp(CallLogApp() as Widget);
 }

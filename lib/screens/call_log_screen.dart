@@ -9,20 +9,29 @@ class CallLogScreen extends StatefulWidget {
 }
 
 class _CallLogScreenState extends State<CallLogScreen> {
-  List<CallLogEntry> _callLogs = [];
+  DateTime? _startDate;
+  DateTime? _endDate;
+  Stream<List<CallLogEntry>>? _filteredCallLogsStream;
 
   @override
   void initState() {
     super.initState();
-    _fetchCallLogs();
+    _filteredCallLogsStream = _fetchFilteredCallLogsStream(DateTime.now(), DateTime.now());
   }
 
-  Future<void> _fetchCallLogs() async {
-    // Fetch call logs using the call_log package
-    Iterable<CallLogEntry> callLogs = await CallLog.get();
-    setState(() {
-      _callLogs = callLogs.toList();
-    });
+  Stream<List<CallLogEntry>> _fetchFilteredCallLogsStream(DateTime startDate, DateTime endDate) async* {
+    while (true) {
+      await Future.delayed(Duration(seconds: 1)); // Adjust the delay time as needed
+      Iterable<CallLogEntry> callLogs = await CallLog.get();
+      yield _filterCallLogs(callLogs, startDate, endDate);
+    }
+  }
+
+  List<CallLogEntry> _filterCallLogs(Iterable<CallLogEntry> callLogs, DateTime startDate, DateTime endDate) {
+    return callLogs.where((call) {
+      final DateTime callDateTime = DateTime.fromMillisecondsSinceEpoch(call.timestamp ?? 0);
+      return callDateTime.isAfter(startDate.subtract(Duration(days: 1))) && callDateTime.isBefore(endDate.add(Duration(days: 1)));
+    }).toList();
   }
 
   @override
@@ -30,31 +39,49 @@ class _CallLogScreenState extends State<CallLogScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Call Log'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.filter_list),
+            onPressed: () => _showFilterDateRangePicker(),
+          ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: _callLogs.length,
-        itemBuilder: (context, index) {
-          final call = _callLogs[index];
-          return ListTile(
-            leading: IconButton(
-              icon: Icon(Icons.call),
-              onPressed: () {
-                _makeCall(call.number ?? '');
+      body: StreamBuilder<List<CallLogEntry>>(
+        stream: _filteredCallLogsStream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final callLogs = snapshot.data ?? [];
+            return ListView.builder(
+              itemCount: callLogs.length,
+              itemBuilder: (context, index) {
+                final call = callLogs[index];
+                return ListTile(
+                  leading: IconButton(
+                    icon: Icon(Icons.call),
+                    onPressed: () {
+                      _makeCall(call.number ?? '');
+                    },
+                  ),
+                  title: Text(call.name ?? 'Unknown'),
+                  subtitle: Text(call.number ?? 'Unknown'),
+                  trailing: Text(_formatTimestamp(call.timestamp)),
+                  onTap: () {
+                    // Navigate to ContactDetailsScreen when tapped
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ContactDetailsScreen(call),
+                      ),
+                    );
+                  },
+                );
               },
-            ),
-            title: Text(call.name ?? 'Unknown'),
-            subtitle: Text(call.number ?? 'Unknown'),
-            trailing: Text(_formatTimestamp(call.timestamp)),
-            onTap: () {
-              // Navigate to ContactDetailsScreen when tapped
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ContactDetailsScreen(call),
-                ),
-              );
-            },
-          );
+            );
+          }
         },
       ),
     );
@@ -68,7 +95,6 @@ class _CallLogScreenState extends State<CallLogScreen> {
     return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
   }
 
-  // Function to make a call
   void _makeCall(String phoneNumber) async {
     try {
       final url = 'tel:$phoneNumber';
@@ -81,6 +107,30 @@ class _CallLogScreenState extends State<CallLogScreen> {
           content: Text('Could not make a call'),
         ),
       );
+    }
+  }
+
+  Future<void> _showFilterDateRangePicker() async {
+    final DateTime? pickedStartDate = await showDatePicker(
+      context: context,
+      initialDate: _startDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (pickedStartDate != null) {
+      final DateTime? pickedEndDate = await showDatePicker(
+        context: context,
+        initialDate: _endDate ?? pickedStartDate,
+        firstDate: pickedStartDate,
+        lastDate: DateTime.now(),
+      );
+      if (pickedEndDate != null) {
+        setState(() {
+          _startDate = pickedStartDate;
+          _endDate = pickedEndDate;
+          _filteredCallLogsStream = _fetchFilteredCallLogsStream(pickedStartDate, pickedEndDate);
+        });
+      }
     }
   }
 }
