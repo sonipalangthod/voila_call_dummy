@@ -42,18 +42,45 @@ class _DialpadScreenState extends State<DialpadScreen> {
     });
   }
 
-  void _makeCall() {
+  void _makeCall() async {
     String phoneNumber = _enteredDigits.join();
-    launch('tel:$phoneNumber');
+
+    // Launch the call
+    await launch('tel:$phoneNumber');
+
+    // Navigate to the status of call page
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => VoilaCallScreen()),
+      MaterialPageRoute(
+        builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber),
+      ),
     );
   }
 
+
+
   void _makeCallToContact(String phoneNumber) {
-    launch('tel:$phoneNumber');
+    launch('tel:$phoneNumber').then((value) {
+      // Once the call is made, navigate to the VoilaCallScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber),
+        ),
+      );
+    }).catchError((error) {
+      // Handle error if call couldn't be initiated
+      print('Error making call: $error');
+      // Still navigate to the VoilaCallScreen even if call couldn't be initiated
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber),
+        ),
+      );
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {

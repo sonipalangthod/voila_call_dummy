@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'contact_details_screen.dart'; // Import the ContactDetailsScreen
 import 'package:url_launcher/url_launcher.dart';
+import 'voila_call_screen.dart'; // Import the VoilaCallScreen
 
 class CallLogScreen extends StatefulWidget {
   @override
@@ -99,6 +100,13 @@ class _CallLogScreenState extends State<CallLogScreen> {
     try {
       final url = 'tel:$phoneNumber';
       await launch(url);
+      // After the call ends, navigate to the status of call page
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber),
+        ),
+      );
     } catch (e) {
       // Handle error if call cannot be launched
       print('Error launching call: $e');

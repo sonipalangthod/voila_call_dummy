@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             CallLogScreen(),
             DialpadScreen(),
-            VoilaCallScreen(),
+            VoilaCallScreen(phoneNumber: '0000000000'),
             StatisticsPage(), // Add the statistics page as a tab
           ],
         ),
