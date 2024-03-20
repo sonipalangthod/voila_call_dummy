@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'leads_information_page.dart';
+import 'package:flutter/material.dart';
+
 
 class StatisticsPage extends StatefulWidget {
   @override
@@ -67,6 +70,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
               ),
             ),
             _buildCommonStatistics(),
+            TextButton(
+              onPressed: _navigateToLeadsInformationPage,
+              child: Text('View Leads Information'),
+            ),
           ],
         ),
       ),
@@ -157,14 +164,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 
-
   Widget _buildCommonStatistics() {
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-
           SizedBox(height: 10),
           _buildStatisticTile(Icons.phone, 'Total Dialed Calls', _totalDialedCalls),
           _buildStatisticTile(Icons.av_timer, 'Average Talk Time', _averageTalkTime),
@@ -191,6 +196,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _navigateToLeadsInformationPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LeadsInformationPage()),
     );
   }
 }

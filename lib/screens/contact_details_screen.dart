@@ -1,53 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
-class ContactDetailsScreen extends StatelessWidget {
+class ContactDetailsScreen extends StatefulWidget {
   final CallLogEntry call;
 
   ContactDetailsScreen(this.call);
 
-  void _makeCall(String number) {
-    launch('tel:$number');
+  @override
+  _ContactDetailsScreenState createState() => _ContactDetailsScreenState();
+}
+
+class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
+  late List<CallLogEntry> callLogEntries;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCallLogEntries();
+  }
+
+  Future<void> _fetchCallLogEntries() async {
+    Iterable<CallLogEntry> callLogs = await CallLog.get();
+    setState(() {
+      callLogEntries = callLogs.toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(call.name ?? 'Unknown'),
+        title: Text(widget.call.name ?? 'Unknown'),
       ),
-      body: Column(
-        children: [
-          ListTile(
-            title: Text(
-              'Number',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(call.number ?? 'Unknown'),
-          ),
-          ListTile(
-            title: Text('Duration'),
-            subtitle: Text(_formatDuration(call.duration)),
-          ),
-          ListTile(
-            title: Text('Timestamp'),
-            subtitle: Text(_formatDateTime(call.timestamp ?? 0)),
-          ),
-          ListTile(
-            title: Text('Status'),
-            subtitle: Text(_getCallStatus(call)),
-          ),
-        ],
+      body: ListView.builder(
+        itemCount: callLogEntries.length,
+        itemBuilder: (context, index) {
+          final callLogEntry = callLogEntries[index];
+          return _buildCallHistoryTile(callLogEntry);
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _makeCall(call.number ?? '');
+          _makeCall(widget.call.number ?? '');
         },
         child: Icon(Icons.call),
       ),
     );
   }
+
+  Widget _buildCallHistoryTile(CallLogEntry callLogEntry) {
+    IconData icon;
+    Color iconColor;
+    String status;
+    if (callLogEntry.callType == CallType.incoming) {
+      icon = Icons.phone;
+      iconColor = Colors.green;
+      status = callLogEntry.duration == 0 ? 'Missed' : 'Answered';
+    } else {
+      icon = Icons.call_made; // Change to Icons.call_made for outgoing calls
+      iconColor = Colors.red;
+      status = callLogEntry.duration == 0 ? 'Rejected' : 'Answered';
+    }
+
+    return Column(
+      children: [
+        ListTile(
+          title: Text(_formatDateTime(callLogEntry.timestamp ?? 0)),
+          subtitle: Text('Duration: ${_formatDuration(callLogEntry.duration)} | Status: $status'),
+          trailing: Icon(
+            icon,
+            color: iconColor,
+          ),
+        ),
+        Divider(
+          height: 1,
+          color: Colors.grey,
+          thickness: 1,
+          indent: 16,
+          endIndent: 16,
+        ),
+      ],
+    );
+  }
+
+
 
   String _formatDuration(int? durationInSeconds) {
     if (durationInSeconds == null) {
@@ -59,18 +97,10 @@ class ContactDetailsScreen extends StatelessWidget {
 
   String _formatDateTime(int timestamp) {
     final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
+    return '${DateFormat('EEEE, MMMM d, y').format(dateTime)} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
   }
 
-  String _getCallStatus(CallLogEntry call) {
-    if (call.duration == 0) {
-      if (call.callType == CallType.incoming) {
-        return 'Missed';
-      } else {
-        return 'Rejected';
-      }
-    } else {
-      return 'Answered';
-    }
+  void _makeCall(String number) {
+    launch('tel:$number');
   }
 }
