@@ -20,20 +20,31 @@ class _LeadsInformationPageState extends State<LeadsInformationPage> {
   }
 
   Future<void> _fetchLeadsCount() async {
-    int hotLeads = await DatabaseHelper.getLeadCount('hot lead');
-    int coldLeads = await DatabaseHelper.getLeadCount('cold lead');
-    int openLeads = await DatabaseHelper.getLeadCount('open lead');
-    int warmLeads = await DatabaseHelper.getLeadCount('warm lead');
-    int totalCustomers = await DatabaseHelper.getTotalCustomersCount();
-    setState(() {
-      _hotLeadsCount = hotLeads;
-      _coldLeadsCount = coldLeads;
-      _openLeadsCount = openLeads;
-      _warmLeadsCount = warmLeads;
-      _totalCustomers = totalCustomers;
-    });
-  }
+    try {
+      int hotLeads = await DatabaseHelper.getLeadCount('hot lead');
+      int coldLeads = await DatabaseHelper.getLeadCount('cold lead');
+      int openLeads = await DatabaseHelper.getLeadCount('open lead');
+      int warmLeads = await DatabaseHelper.getLeadCount('warm lead');
+      int totalCustomers = await DatabaseHelper.getTotalCustomersCount();
 
+      print('Hot Leads: $hotLeads');
+      print('Cold Leads: $coldLeads');
+      print('Open Leads: $openLeads');
+      print('Warm Leads: $warmLeads');
+      print('Total Customers: $totalCustomers');
+
+      setState(() {
+        _hotLeadsCount = hotLeads;
+        _coldLeadsCount = coldLeads;
+        _openLeadsCount = openLeads;
+        _warmLeadsCount = warmLeads;
+        _totalCustomers = totalCustomers;
+      });
+    } catch (e) {
+      print('Error fetching leads count: $e');
+      // Handle errors here, you can set default values or show an error message
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
