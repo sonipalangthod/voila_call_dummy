@@ -61,6 +61,7 @@ class _VoilaCallScreenState extends State<VoilaCallScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Status of call'),
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Padding(

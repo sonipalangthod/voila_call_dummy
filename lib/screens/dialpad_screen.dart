@@ -87,6 +87,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dialpad'),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [

@@ -3,6 +3,7 @@ import 'package:voila_call_dummy/screens/call_log_screen.dart';
 import 'package:voila_call_dummy/screens/dialpad_screen.dart';
 import 'package:voila_call_dummy/screens/voila_call_screen.dart';
 import 'package:voila_call_dummy/screens/statistics_page.dart';
+import 'package:voila_call_dummy/auth/login_screen.dart'; // Import your login screen
 
 class DashboardScreen extends StatelessWidget {
   final String username;
@@ -15,7 +16,16 @@ class DashboardScreen extends StatelessWidget {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Voila_Call - Welcome $username'),
+          title: Text('Voila_Call $username'),
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () {
+                _logout(context);
+              },
+            ),
+          ],
           bottom: TabBar(
             tabs: [
               Tab(text: 'Call Log'),
@@ -36,4 +46,11 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _logout(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
+
 }

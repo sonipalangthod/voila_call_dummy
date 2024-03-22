@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'leads_information_page.dart';
-import 'package:flutter/material.dart';
+
 class StatisticsPage extends StatefulWidget {
   @override
   _StatisticsPageState createState() => _StatisticsPageState();
@@ -55,7 +55,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
           endDate = selectedDates[1];
         }
         break;
-
     }
 
     Iterable<CallLogEntry> callLogs = await CallLog.query(
@@ -85,14 +84,16 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Statistics'),
+          automaticallyImplyLeading: false,
           bottom: TabBar(
             tabs: [
               Tab(text: 'Connected Calls'),
               Tab(text: 'Incoming/Outgoing Calls'),
+              Tab(text: 'View Leads Information'), // Added "View Leads Information" tab
             ],
           ),
           actions: [
@@ -115,21 +116,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
             ),
           ],
         ),
-        body: Column(
+        body: TabBarView(
           children: [
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _buildConnectedCallsTab(),
-                  _buildInOutCallsTab(),
-                ],
-              ),
-            ),
-            _buildCommonStatistics(),
-            TextButton(
-              onPressed: _navigateToLeadsInformationPage,
-              child: Text('View Leads Information'),
-            ),
+            _buildConnectedCallsTab(),
+            _buildInOutCallsTab(),
+            LeadsInformationPage(), // Directly add LeadsInformationPage
           ],
         ),
       ),
@@ -146,34 +137,39 @@ class _StatisticsPageState extends State<StatisticsPage> {
       Colors.red,
     ];
 
-    return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: PieChart(
-        dataMap: connectedCallsData,
-        animationDuration: Duration(milliseconds: 800),
-        chartLegendSpacing: 32,
-        chartRadius: MediaQuery.of(context).size.width / 2,
-        initialAngleInDegree: 0,
-        chartType: ChartType.ring,
-        ringStrokeWidth: 32,
-        centerText: "CALL STATUS",
-        legendOptions: LegendOptions(
-          showLegendsInRow: false,
-          legendPosition: LegendPosition.bottom,
-          showLegends: true,
-          legendTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
+    return ListView(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(16.0),
+          child: PieChart(
+            dataMap: connectedCallsData,
+            animationDuration: Duration(milliseconds: 800),
+            chartLegendSpacing: 32,
+            chartRadius: MediaQuery.of(context).size.width / 2,
+            initialAngleInDegree: 0,
+            chartType: ChartType.ring,
+            ringStrokeWidth: 32,
+            centerText: "CALL STATUS",
+            legendOptions: LegendOptions(
+              showLegendsInRow: false,
+              legendPosition: LegendPosition.bottom,
+              showLegends: true,
+              legendTextStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            chartValuesOptions: ChartValuesOptions(
+              showChartValueBackground: true,
+              showChartValues: true,
+              showChartValuesInPercentage: false,
+              showChartValuesOutside: false,
+              decimalPlaces: 0,
+            ),
+            colorList: colorList,
           ),
         ),
-        chartValuesOptions: ChartValuesOptions(
-          showChartValueBackground: true,
-          showChartValues: true,
-          showChartValuesInPercentage: false,
-          showChartValuesOutside: false,
-          decimalPlaces: 0,
-        ),
-        colorList: colorList,
-      ),
+        _buildCommonStatistics(),
+      ],
     );
   }
 
@@ -189,51 +185,57 @@ class _StatisticsPageState extends State<StatisticsPage> {
       Colors.blue,
       Colors.green,
     ];
-    return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: PieChart(
-        dataMap: inOutCallsData,
-        animationDuration: Duration(milliseconds: 800),
-        chartLegendSpacing: 32,
-        chartRadius: MediaQuery.of(context).size.width / 2,
-        initialAngleInDegree: 0,
-        chartType: ChartType.ring,
-        ringStrokeWidth: 32,
-        centerText: "CALL TYPE",
-        legendOptions: LegendOptions(
-          showLegendsInRow: false,
-          legendPosition: LegendPosition.bottom,
-          showLegends: true,
-          legendTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
+    return ListView(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(16.0),
+          child: PieChart(
+            dataMap: inOutCallsData,
+            animationDuration: Duration(milliseconds: 800),
+            chartLegendSpacing: 32,
+            chartRadius: MediaQuery.of(context).size.width / 2,
+            initialAngleInDegree: 0,
+            chartType: ChartType.ring,
+            ringStrokeWidth: 32,
+            centerText: "CALL TYPE",
+            legendOptions: LegendOptions(
+              showLegendsInRow: false,
+              legendPosition: LegendPosition.bottom,
+              showLegends: true,
+              legendTextStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            chartValuesOptions: ChartValuesOptions(
+              showChartValueBackground: true,
+              showChartValues: true,
+              showChartValuesInPercentage: false,
+              showChartValuesOutside: false,
+              decimalPlaces: 0,
+            ),
+            colorList: colorList,
           ),
         ),
-        chartValuesOptions: ChartValuesOptions(
-          showChartValueBackground: true,
-          showChartValues: true,
-          showChartValuesInPercentage: false,
-          showChartValuesOutside: false,
-          decimalPlaces: 0,
-        ),
-        colorList: colorList,
-      ),
+        _buildCommonStatistics(),
+      ],
     );
   }
 
   Widget _buildCommonStatistics() {
-    return Padding(
+    return SingleChildScrollView(
+        child: Padding(
         padding: EdgeInsets.all(16.0),
-    child: Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-    SizedBox(height: 10),
-    _buildStatisticTile(Icons.phone, 'Total Dialed Calls', _totalDialedCalls),
-    _buildStatisticTile(Icons.av_timer, 'Average Talk Time', _averageTalkTime),
-    _buildStatisticTile(Icons.check_circle, 'Connected Calls', _totalConnectedCalls),
-    _buildStatisticTile(Icons.cancel, 'Not Connected Calls', _totalNotConnectedCalls),
-      _buildStatisticTile(Icons.timer, 'Total Talk Time', _totalTalkTime),
-    ],
+    child: Column(          crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(height: 10),
+        _buildStatisticTile(Icons.phone, 'Total Dialed Calls', _totalDialedCalls),
+        _buildStatisticTile(Icons.av_timer, 'Average Talk Time', _averageTalkTime),
+        _buildStatisticTile(Icons.check_circle, 'Connected Calls', _totalConnectedCalls),
+        _buildStatisticTile(Icons.cancel, 'Not Connected Calls', _totalNotConnectedCalls),
+        _buildStatisticTile(Icons.timer, 'Total Talk Time', _totalTalkTime),
+      ],
     ),
+        ),
     );
   }
 
@@ -254,16 +256,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       ),
     );
   }
-
-  void _navigateToLeadsInformationPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LeadsInformationPage()),
-    );
-  }
 }
-
-
 
 class CustomDateRangePickerDialog extends StatefulWidget {
   @override
@@ -369,3 +362,4 @@ class _CustomDateRangePickerDialogState
     return value < 10 ? '0$value' : '$value';
   }
 }
+

@@ -51,6 +51,7 @@ class _LeadsInformationPageState extends State<LeadsInformationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Leads Information'),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

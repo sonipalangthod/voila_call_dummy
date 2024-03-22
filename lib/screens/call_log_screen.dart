@@ -40,6 +40,7 @@ class _CallLogScreenState extends State<CallLogScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Call Log'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: Icon(Icons.filter_list),
