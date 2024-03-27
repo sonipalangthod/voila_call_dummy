@@ -3,8 +3,9 @@ import 'package:voila_call_dummy/widgets/database_helper.dart';
 
 class VoilaCallScreen extends StatefulWidget {
   final String phoneNumber;
+  final int callDuration;
 
-  VoilaCallScreen({required this.phoneNumber});
+  VoilaCallScreen({required this.phoneNumber,required this.callDuration});
 
   @override
   _VoilaCallScreenState createState() => _VoilaCallScreenState();
@@ -33,6 +34,7 @@ class _VoilaCallScreenState extends State<VoilaCallScreen> {
     String comment = commentController.text;
     String callType = selectedCallType;
     String callTag = selectedCallTag;
+    int callDuration = widget.callDuration;
     // Get current date and time
     DateTime now = DateTime.now();
     String callDate = now.toString();
@@ -45,6 +47,7 @@ class _VoilaCallScreenState extends State<VoilaCallScreen> {
       DatabaseHelper.colCallTag: callTag,
       DatabaseHelper.colDate: callDate,
       DatabaseHelper.colLead: selectedLead,
+      DatabaseHelper.colDuration: callDuration,
     });// Store customer data in the database
     nameController.clear();
     phoneNumberController.clear();
@@ -231,3 +234,4 @@ class _VoilaCallScreenState extends State<VoilaCallScreen> {
     );
   }
 }
+

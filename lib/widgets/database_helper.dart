@@ -27,7 +27,7 @@ class DatabaseHelper {
   Future<Database> initializeDatabase() async {
     final path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'customer_database.db'),
+      join(path, 'customers_database.db'),
       onCreate: (db, version) {
         return db.execute(
           '''CREATE TABLE $customersTableName (
@@ -48,10 +48,23 @@ class DatabaseHelper {
   }
 
   // Insert a customer
+  // Insert a customer
   Future<int> insertCustomer(Map<String, dynamic> customer) async {
     try {
-      final int callDuration = await getCallDuration();
-      final Map<String, dynamic> customerWithCallDuration = {...customer, colDuration: callDuration};
+      final int callDurationInSeconds = customer[DatabaseHelper.colDuration] ?? 0;
+
+      // Calculate hours, minutes, and remaining seconds
+      int hours = callDurationInSeconds ~/ 3600;
+      int remainingSeconds = callDurationInSeconds % 3600;
+      int minutes = remainingSeconds ~/ 60;
+      int seconds = remainingSeconds % 60;
+
+      final String callDuration = '$hours:$minutes:$seconds'; // Format as HH:MM:SS
+
+      final Map<String, dynamic> customerWithCallDuration = {
+        ...customer,
+        DatabaseHelper.colDuration: callDuration,
+      };
 
       final db = await database;
       return db.insert(customersTableName, customerWithCallDuration);
@@ -60,6 +73,8 @@ class DatabaseHelper {
       return -1; // Return -1 if there's an error
     }
   }
+
+
 
   // Retrieve all customers
   Future<List<Map<String, dynamic>>> getCustomers() async {

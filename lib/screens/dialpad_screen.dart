@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:call_log/call_log.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:voila_call_dummy/call_log.dart'; // Import CallLogService
-import 'package:voila_call_dummy/screens/voila_call_screen.dart'; // Import VoilaCallScreen
+import 'package:voila_call_dummy/widgets/custom_dialpad.dart';
+import 'package:voila_call_dummy/screens/voila_call_screen.dart';
 import 'package:voila_call_dummy/services/call_service.dart';
-import 'package:voila_call_dummy/widgets/custom_dialpad.dart'; // Import CustomDialpad
 
 class DialpadScreen extends StatefulWidget {
   @override
@@ -45,42 +44,38 @@ class _DialpadScreenState extends State<DialpadScreen> {
   void _makeCall() async {
     String phoneNumber = _enteredDigits.join();
 
-    // Launch the call
-    await launch('tel:$phoneNumber');
+    bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNumber);
+    if (!res!) {
+      // Handle error if call couldn't be initiated
+      print('Error making call');
+      return;
+    }
 
-    // Navigate to the status of call page
+    // Once the call is made, navigate to the VoilaCallScreen
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber),
+        builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber,callDuration: 0),
       ),
     );
   }
 
-
-
-  void _makeCallToContact(String phoneNumber) {
-    launch('tel:$phoneNumber').then((value) {
-      // Once the call is made, navigate to the VoilaCallScreen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber),
-        ),
-      );
-    }).catchError((error) {
+  void _makeCallToContact(String phoneNumber) async {
+    bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNumber);
+    if (!res!) {
       // Handle error if call couldn't be initiated
-      print('Error making call: $error');
-      // Still navigate to the VoilaCallScreen even if call couldn't be initiated
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber),
-        ),
-      );
-    });
-  }
+      print('Error making call');
+      return;
+    }
 
+    // Once the call is made, navigate to the VoilaCallScreen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber,callDuration: 0),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,14 +102,12 @@ class _DialpadScreenState extends State<DialpadScreen> {
               },
             ),
           ),
-          Text(
-            _enteredDigits.join(), // Display entered digits
-            style: TextStyle(fontSize: 20),
-          ),
+
           CustomDialpad(
             onDigitPressed: _handleDigitPressed,
             onClearPressed: _handleClearPressed,
             onCallPressed: _makeCall,
+            enteredDigits: _enteredDigits,// Assign the _makeCall function here
           ),
         ],
       ),

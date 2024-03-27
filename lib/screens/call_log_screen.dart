@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'contact_details_screen.dart'; // Import the ContactDetailsScreen
-import 'package:url_launcher/url_launcher.dart';
 import 'voila_call_screen.dart'; // Import the VoilaCallScreen
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class CallLogScreen extends StatefulWidget {
   @override
@@ -43,7 +43,7 @@ class _CallLogScreenState extends State<CallLogScreen> {
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list),
+            icon: Icon(Icons.edit_calendar_outlined),
             onPressed: () => _showFilterDateRangePicker(),
           ),
         ],
@@ -64,6 +64,7 @@ class _CallLogScreenState extends State<CallLogScreen> {
                 return ListTile(
                   leading: IconButton(
                     icon: Icon(Icons.call),
+                    color: Color(0xFF16D539),
                     onPressed: () {
                       _makeCall(call.number ?? '');
                     },
@@ -99,13 +100,12 @@ class _CallLogScreenState extends State<CallLogScreen> {
 
   void _makeCall(String phoneNumber) async {
     try {
-      final url = 'tel:$phoneNumber';
-      await launch(url);
+      await FlutterPhoneDirectCaller.callNumber(phoneNumber);
       // After the call ends, navigate to the status of call page
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber),
+          builder: (context) => VoilaCallScreen(phoneNumber: phoneNumber,callDuration: 0),
         ),
       );
     } catch (e) {

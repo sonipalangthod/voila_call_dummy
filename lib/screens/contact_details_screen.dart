@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class ContactDetailsScreen extends StatefulWidget {
   final CallLogEntry call;
@@ -67,10 +68,11 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.call.name ?? 'Unknown'),
+        title: Text(widget.call.name ?? 'Unknown',style: TextStyle(color: Colors.white),),
+        backgroundColor: Color(0xFF5E17EB),
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list),
+            icon: Icon(Icons.edit_calendar_outlined, color: Colors.white),
             onPressed: () => _filterCallLogEntriesByDateRange(),
           ),
         ],
@@ -86,7 +88,8 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
         onPressed: () {
           _makeCall(widget.call.number ?? '');
         },
-        child: Icon(Icons.call),
+        child: Icon(Icons.call,color:Color(0xB80EF626)),
+        backgroundColor: Color(0xC5106EEA),
       ),
     );
   }
@@ -96,12 +99,12 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     Color iconColor;
     String status;
     if (callLogEntry.callType == CallType.incoming) {
-      icon = Icons.phone;
+      icon = Icons.call_received_outlined;
       iconColor = Colors.green;
       status = callLogEntry.duration == 0 ? 'Missed' : 'Answered';
     } else {
-      icon = Icons.call_made; // Change to Icons.call_made for outgoing calls
-      iconColor = Colors.red;
+      icon = Icons.call_made_outlined; // Change to Icons.call_made for outgoing calls
+      iconColor = Colors.green;
       status = callLogEntry.duration == 0 ? 'Rejected' : 'Answered';
     }
 
@@ -140,6 +143,6 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   }
 
   void _makeCall(String number) {
-    launch('tel:$number');
+    FlutterPhoneDirectCaller.callNumber(number);
   }
 }

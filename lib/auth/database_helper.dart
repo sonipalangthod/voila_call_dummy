@@ -12,7 +12,7 @@ class DatabaseHelper {
   }
 
   static Future<Database> initDatabase() async {
-    final path = join(await getDatabasesPath(), 'user_database.db');
+    final path = join(await getDatabasesPath(), 'users_database.db');
     print('Database path: $path'); // Log the database path
     return openDatabase(
       path,
